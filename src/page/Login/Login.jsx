@@ -1,15 +1,16 @@
 import { useState } from "react";
-import Input from "../../components/commen/input/input";
 import { useForm } from "react-hook-form";
 import { Toaster, toast } from "react-hot-toast";
-import Heading from "../../components/commen/heading/Heading";
-import Button from "../../components/commen/button/Button";
-import { useLoginMutation } from "../../Redux/Feature/authSlice";
+import { useLoginMutation } from "../../Redux/Feature/authApi";
+import Input from "../../components/common/input/input";
+import Heading from "../../components/common/heading/Heading";
+import Button from "../../components/common/button/Button";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [isDisable, setIsDisable] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
-
+  const nevaigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -27,13 +28,14 @@ export const Login = () => {
       .unwrap()
       .then((response) => {
         toast.success("Logged in");
-        console.log(response);
+        localStorage.setItem("user", JSON.stringify(response));
+        nevaigate("/admin/dashboard");
         // Handle successful login response, e.g., store user token or redirect
       })
       .catch((error) => {
         // Handle login error
         console.log("error", error);
-        toast.error(error.data.status);
+        toast.error(error);
       })
       .finally(() => {
         setIsDisable(false);

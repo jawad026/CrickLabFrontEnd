@@ -1,23 +1,19 @@
+import { useNavigate } from "react-router-dom";
+import { useGetSeriesAllQuery } from "../../../Redux/Feature/seriesApi";
 import Button from "../../../components/common/button/Button";
 import Heading from "../../../components/common/heading/Heading";
 import Table from "../../../components/common/table/Table";
 import { IoIosAddCircle } from "react-icons/io";
 const Series = () => {
+  const { data = [], isLoading, isFetching } = useGetSeriesAllQuery();
+  const nevigate = useNavigate();
+  console.log(isLoading, "isLoading");
+  console.log(isFetching, "isFetching");
   const column = [
-    { name: "id" },
     { name: "name" },
     { name: "type" },
     { name: "over" },
     { name: "teams" },
-  ];
-  const data = [
-    {
-      id: 0,
-      name: "Asia Cup",
-      type: "One Day",
-      over: "50",
-      teams: 20,
-    },
   ];
   return (
     <>
@@ -29,6 +25,8 @@ const Series = () => {
               <Button
                 label={"Create New"}
                 small
+                optional={"flex gap-1"}
+                onClick={() => nevigate("/admin/addseries")}
                 Icon={<IoIosAddCircle size={24} className="px-1" />}
               />
             </div>
