@@ -1,19 +1,17 @@
 import { useForm } from "react-hook-form";
 import Heading from "../../../components/common/heading/Heading";
 import Input from "../../../components/common/input/input";
-import { toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import Select from "../../../components/common/input/select";
 import Button from "../../../components/common/button/Button";
 import { useGetTeamAllQuery } from "../../../Redux/Feature/teamApi";
 import { useGetSeriesAllQuery } from "../../../Redux/Feature/seriesApi";
+import { useAddMatchMutation } from "../../../Redux/Feature/matchApi";
 const AddMatch = () => {
-  const isLoading = false;
   const { data: teamData = [] } = useGetTeamAllQuery();
-
-  // Fetch series data
   const { data: seriesData = [] } = useGetSeriesAllQuery();
+  const [match, { isLoading }] = useAddMatchMutation();
 
-  console.log(seriesData);
   const {
     register,
     handleSubmit,
@@ -30,19 +28,18 @@ const AddMatch = () => {
   const teamA = watch("teamA");
   console.log(teamA);
   const onSubmit = (data) => {
-    console.log(data);
-    // series(data)
-    //   .unwrap()
-    //   .then((response) => {
-    //     toast.success("Logged in");
-    //     console.log(response);
-    //     // Handle successful login response, e.g., store user token or redirect
-    //   })
-    //   .catch((error) => {
-    //     // Handle login error
-    //     console.log("error", error);
-    //     toast.error(error);
-    //   });
+    match(data)
+      .unwrap()
+      .then((response) => {
+        toast.success("Match Sheduled");
+        console.log(response);
+        // Handle successful login response, e.g., store user token or redirect
+      })
+      .catch((error) => {
+        // Handle login error
+        console.log("error", error);
+        toast.error(error);
+      });
   };
   return (
     <div>
@@ -88,7 +85,7 @@ const AddMatch = () => {
             id="seriesId"
             disabled={isLoading}
             register={register}
-            required={true}
+            required={false}
             errors={errors}
             label="Select the Series (optional)"
             options={seriesData}
@@ -101,6 +98,7 @@ const AddMatch = () => {
           />
         </div>
       </form>
+      <Toaster />
     </div>
   );
 };

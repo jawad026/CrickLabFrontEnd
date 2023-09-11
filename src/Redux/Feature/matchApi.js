@@ -9,9 +9,18 @@ export const matchApi = createApi({
       query: () => `match`,
       pollingInterval: 5000,
     }),
+
+    // Add a new series
+    addMatch: builder.mutation({
+      query: (newMatch) => ({
+        url: "match/addmatch",
+        method: "POST",
+        body: newMatch,
+      }),
+    }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetMatchAllQuery } = matchApi;
+export const { useGetMatchAllQuery, useAddMatchMutation } = matchApi;

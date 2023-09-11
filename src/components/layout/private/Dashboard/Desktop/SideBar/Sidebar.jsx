@@ -37,6 +37,15 @@ const Sidebar = () => {
               <span className="ml-3">Match</span>
             </Link>
           </li>
+          <li>
+            <Link
+              to="/admin/golive"
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+            >
+              <BsFillCalendarEventFill />
+              <span className="ml-3">Go live</span>
+            </Link>
+          </li>
         </ul>
       </div>
     </aside>

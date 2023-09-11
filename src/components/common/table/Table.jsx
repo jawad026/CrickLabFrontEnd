@@ -74,10 +74,10 @@ const Table = ({ column, data, action, onAction, status }) => {
               {action && (
                 <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
                   <button
-                    onClick={() => onAction(row)}
+                    onClick={() => onAction(row._id)}
                     className="text-indigo-600 hover:text-indigo-900"
                   >
-                    Edit
+                    Go live
                   </button>
                 </td>
               )}

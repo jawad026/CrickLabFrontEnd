@@ -8,6 +8,9 @@ import Home from "./page/Home";
 import { Login } from "./page/Login/Login";
 import Dashboard from "./page/admin/Dashboard/Dashboard";
 import { Index } from "./components/layout/private/Dashboard";
+import GoLive from "./page/admin/GoLive/GoLive";
+import StartMatch from "./page/admin/StartMatch/StartMatch";
+import CoinTossSimulator from "./page/admin/CoinSimulation/CoinSimulation";
 function App() {
   return (
     <>
@@ -19,6 +22,9 @@ function App() {
           <Route path="match" element={<Match />} />
           <Route path="addseries" element={<AddSeries />} />
           <Route path="addmatch" element={<AddMatch />} />
+          <Route path="golive" element={<GoLive />} />
+          <Route path="startmatch" element={<StartMatch />} />
+          <Route path="toss/:id" element={<CoinTossSimulator />} />
         </Route>
         <Route path="/admin/login" element={<Login />} />
       </Routes>
