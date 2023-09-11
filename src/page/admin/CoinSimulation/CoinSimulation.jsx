@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetMatchAllQuery } from "../../../Redux/Feature/matchApi";
 import { useNavigate, useParams } from "react-router-dom";
 import Heading from "../../../components/common/heading/Heading";
@@ -9,10 +9,13 @@ function CoinTossSimulator() {
   const nevigate = useNavigate();
   const { data } = useGetMatchAllQuery();
   const [isDisabled, setIsDisabled] = useState(false);
-  const filteredData = data.filter((item) => item._id === id.id);
   const [teamChoice, setTeamChoice] = useState(""); // To store the team's choice
   const [result, setResult] = useState(""); // To store the result of the toss
-
+  const [filteredData,setFilterData]=useState([])
+  useEffect(() => {
+    setFilterData(data.filter((item) => item._id === id.id))
+  }, [data.length])
+  
   // Function to simulate a coin toss
   const tossCoin = () => {
     const randomNum = Math.random();

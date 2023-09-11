@@ -64,10 +64,10 @@ const AddSeries = () => {
             errors={errors}
             label="Select the type"
             options={[
-              { value: "t10", label: "T10" },
-              { value: "t20", label: "T20" },
-              { value: "oneday", label: "One Day" },
-              { value: "test", label: "Test" },
+              { _id: "t10", name: "T10" },
+              { _id: "t20", name: "T20" },
+              { _id: "oneday", name: "One Day" },
+              { _id: "test", name: "Test" },
             ]}
           />
           <Select
@@ -78,10 +78,10 @@ const AddSeries = () => {
             errors={errors}
             label="Select the overs"
             options={[
-              { value: "10", label: "10" },
-              { value: "20", label: "20" },
-              { value: "50", label: "50" },
-              { value: "90", label: "90" },
+              { _id: "10", name: "10" },
+              { _id: "20", name: "20" },
+              { _id: "50", name: "50" },
+              { _id: "90", name: "90" },
             ]}
           />
           <Input
