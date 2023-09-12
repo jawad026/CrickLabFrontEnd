@@ -5,16 +5,11 @@ export const Index = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <div className="w-1/6 sm:hidden lg:block">
+      <div className="w-1/6 sm:hidden lg:block fixed h-full">
         <Sidebar />
       </div>
-
-      <div className="w-1/6 sm:block lg:hidden">
-        <Sidebar />
-      </div>
-
       {/* Main Content */}
-      <div className="w-5/6 p-4">
+      <div className="w-5/6 p-4 ml-[16.6667%]">
         <Outlet />
       </div>
     </div>

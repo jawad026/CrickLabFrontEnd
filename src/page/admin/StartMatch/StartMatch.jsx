@@ -3,34 +3,38 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useGetTeamPlayersQuery } from "../../../Redux/Feature/playerApi";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Button from "../../../components/common/button/Button";
 import Heading from "../../../components/common/heading/Heading";
 
 const StartMatch = () => {
-  const status = useLocation();
-  const { data: player = [] } = useGetTeamPlayersQuery(status.state.team);
+  const param = useParams();
+  const match = localStorage.getItem(param.id);
+  console.log(match);
+  const { data: bat = [] } = useGetTeamPlayersQuery(JSON.parse(match).bat);
+  const { data: balling = [] } = useGetTeamPlayersQuery(JSON.parse(match).ball);
   const socket = io("http://localhost:3001"); // Replace with your server URL
   const [run, setRun] = useState(0);
   const [ball, setBall] = useState(0);
   const [out, setOut] = useState([]);
   const [playerScore, setPlayerScore] = useState([]);
   const [active, setActive] = useState([]);
-  const [over, setOver] = useState('0.0');
+  const [over, setOver] = useState("0.0");
   const [nextTobat, setNextToBat] = useState([]);
-
+  const [baller, setBaller] = useState([]);
+  const [disable, setDisable] = useState(false);
   useEffect(() => {
-    if (player.length > 0) {
-      setActive([player[0]._id, player[1]._id]);
-      setNextToBat(player.slice(2).map((item) => item._id));
+    if (bat.length > 0) {
+      setActive([bat[0]._id, bat[1]._id]);
+      setNextToBat(bat.slice(2).map((item) => item._id));
 
       const playerScores = {};
-      player.forEach((player) => {
-        playerScores[player._id] = 0;
+      bat.forEach((bat) => {
+        playerScores[bat._id] = 0;
       });
       setPlayerScore(playerScores);
     }
-  }, [player.length]);
+  }, [bat.length]);
 
   const incrementPlayerScore = (playerId, score) => {
     setPlayerScore((prevScores) => ({
@@ -46,9 +50,9 @@ const StartMatch = () => {
     setActive(newArray);
   };
   const convertBallsToOvers = () => {
-    const overs = Math.floor(ball / 6);
-    const remainingBalls = ball % 6 ;
-    console.log(remainingBalls,ball)
+    const overs = Math.floor((ball + 1) / 6);
+    const remainingBalls = (ball + 1) % 6;
+    console.log(remainingBalls, ball);
     setOver(`${overs}.${remainingBalls}`);
   };
   const handleScore = (runs, balls) => {
@@ -56,7 +60,7 @@ const StartMatch = () => {
     setBall((prev) => prev + balls);
     setTimeout(() => {
       convertBallsToOvers();
-    }) 
+    }, 0);
 
     incrementPlayerScore(active[0], runs);
     if (runs === 1 && balls === 1) {
@@ -71,16 +75,31 @@ const StartMatch = () => {
       ball: ball,
       active: active,
       out: out,
+      baller:baller,
+      playerScore: playerScore,
+      over:over
     });
+
+    if (ball % 6 === 0) {
+      setDisable(false);
+    } else {
+      setDisable(true);
+    }
   }, [run, ball]);
   const handleOut = (id) => {
     setOut((prev) => [...prev, id]);
     setActive(active.filter((item) => item !== id));
-    setActive((prev) => [...prev, nextTobat[0]]);
+    setActive((prev) => [nextTobat[0], ...prev]);
     setTimeout(() => {
       nextTobat.shift();
     }, 1000);
   };
+
+  const handleBaller = (id) => {
+    setBaller((prev) => [id, ...prev]);
+    baller.pop();
+  };
+  console.log(baller);
   return (
     <div className="">
       <Heading title={"Score Mointering System"} center />
@@ -116,104 +135,141 @@ const StartMatch = () => {
           <span className="font-bold text-blue-700 text-2xl">{over}</span>
         </h4>
       </div>
-      {/* <table className="table-auto">
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>Name</th>
-            <th>Out</th>
-          </tr>
-        </thead>
-        {player.map((item,i) => {
-          return (
-            <tbody key={item._id}>
-              <tr
-                className={clsx(
-                  `${active.includes(item._id) ? "active" : ""}`,
-                  `${out.includes(item._id) ? "out" : ""}`
-                )}
-              >
-                <td>{i}</td>
-                <td>
-                  {item.name} {`${active[0] === item._id ? "*" : ""}`}
-                </td>
-                {active.includes(item._id) ? (
-                  <td>
-                    <button onClick={() => handleOut(item._id)}>Out</button>
-                  </td>
-                ) : (
-                  ""
-                )}
+
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        <div className="relative overflow-x-auto box-border rounded-lg">
+          <Heading title={"Batting"} center />
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Score
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Out
+                </th>
               </tr>
-            </tbody>
-          );
-        })}
-      </table> */}
+            </thead>
+            {bat.map((item, i) => {
+              return (
+                <tbody key={item._id}>
+                  <tr
+                    className={clsx(
+                      `${
+                        active.includes(item._id)
+                          ? "bg-green-100 text-slate-500"
+                          : ""
+                      }`,
+                      `${out.includes(item._id) ? " text-red-500" : ""}`,
 
-      <div class="relative overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-6 py-3">
-                ID
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Name
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Score
-              </th>
-              <th scope="col" class="px-6 py-3">
-                Out
-              </th>
-            </tr>
-          </thead>
-          {player.map((item, i) => {
-            return (
-              <tbody key={item._id}>
-                <tr
-                  className={clsx(
-                    `${
-                      active.includes(item._id)
-                        ? "bg-green-100 text-slate-500"
-                        : ""
-                    }`,
-                    `${out.includes(item._id) ? " text-red-500" : ""}`,
-
-                    "bg-white border-b  dark:border-gray-700"
-                  )}
-                >
-                  <td
-                    scope="row"
-                    class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap "
+                      "bg-white border-b  dark:border-gray-700"
+                    )}
                   >
-                    {i}
-                  </td>
-                  <td className="px-6 py-2 text-gray-800 ">
-                    {item.name}{" "}
-                    <span className="text-green-700 text-xl">{`${
-                      active[0] === item._id ? "*" : ""
-                    }`}</span>
-                  </td>
-                  <td className="px-6 py-2 text-gray-800">
-                    {playerScore[item._id]}
-                  </td>
-                  {active.includes(item._id) ? (
-                    <td className="px-6 py-2">
-                      <Button
-                        optional={"bg-red-500"}
-                        label={"Out"}
-                        onClick={() => handleOut(item._id)}
-                      />
+                    <td
+                      scope="row"
+                      className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap "
+                    >
+                      {i}
                     </td>
-                  ) : (
-                    ""
-                  )}
-                </tr>
-              </tbody>
-            );
-          })}
-        </table>
+                    <td className="px-6 py-2 text-gray-800 ">
+                      {item.name}{" "}
+                      <span className="text-green-700 text-xl">{`${
+                        active[0] === item._id ? "*" : ""
+                      }`}</span>
+                    </td>
+                    <td className="px-6 py-2 text-gray-800">
+                      {playerScore[item._id]}
+                    </td>
+                    {active.includes(item._id) ? (
+                      <td className="px-6 py-2">
+                        <Button
+                          optional={"bg-red-500"}
+                          label={"Out"}
+                          onClick={() => handleOut(item._id)}
+                        />
+                      </td>
+                    ) : (
+                      ""
+                    )}
+                  </tr>
+                </tbody>
+              );
+            })}
+          </table>
+        </div>
+        <div className="relative overflow-x-auto box-border rounded-lg">
+          <Heading title={"Balling"} center />
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Score
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Baller
+                </th>
+              </tr>
+            </thead>
+            {balling.slice(-5).map((item, i) => {
+              return (
+                <tbody key={item._id}>
+                  <tr
+                    className={clsx(
+                      `${
+                        active.includes(item._id)
+                          ? "bg-green-100 text-slate-500"
+                          : ""
+                      }`,
+                      `${out.includes(item._id) ? " text-red-500" : ""}`,
+
+                      "bg-white border-b  dark:border-gray-700"
+                    )}
+                  >
+                    <td
+                      scope="row"
+                      className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap "
+                    >
+                      {i}
+                    </td>
+                    <td className="px-6 py-2 text-gray-800 ">
+                      {item.name}{" "}
+                      <span className="text-green-700 text-xl">{`${
+                        baller[0] === item._id ? "*" : ""
+                      }`}</span>
+                    </td>
+                    <td className="px-6 py-2 text-gray-800">
+                      {playerScore[item._id]}
+                    </td>
+                    {!baller.includes(item._id) ? (
+                      <td className="px-6 py-2">
+                        <Button
+                          optional={"bg-red-500"}
+                          label={"Baller"}
+                          disabled={disable}
+                          onClick={() => handleBaller(item._id)}
+                        />
+                      </td>
+                    ) : (
+                      ""
+                    )}
+                  </tr>
+                </tbody>
+              );
+            })}
+          </table>
+        </div>
       </div>
     </div>
   );

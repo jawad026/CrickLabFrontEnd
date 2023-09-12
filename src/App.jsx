@@ -11,11 +11,13 @@ import { Index } from "./components/layout/private/Dashboard";
 import GoLive from "./page/admin/GoLive/GoLive";
 import StartMatch from "./page/admin/StartMatch/StartMatch";
 import CoinTossSimulator from "./page/admin/CoinSimulation/CoinSimulation";
+import ScoreCard from "./page/ScoreCard/ScoreCard";
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/score/:id" element={<ScoreCard />} />
         <Route path="/admin/*" element={<Index />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="series" element={<Series />} />
@@ -23,7 +25,7 @@ function App() {
           <Route path="addseries" element={<AddSeries />} />
           <Route path="addmatch" element={<AddMatch />} />
           <Route path="golive" element={<GoLive />} />
-          <Route path="startmatch" element={<StartMatch />} />
+          <Route path="startmatch/:id" element={<StartMatch />} />
           <Route path="toss/:id" element={<CoinTossSimulator />} />
         </Route>
         <Route path="/admin/login" element={<Login />} />

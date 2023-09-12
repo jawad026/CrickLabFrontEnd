@@ -11,11 +11,11 @@ function CoinTossSimulator() {
   const [isDisabled, setIsDisabled] = useState(false);
   const [teamChoice, setTeamChoice] = useState(""); // To store the team's choice
   const [result, setResult] = useState(""); // To store the result of the toss
-  const [filteredData,setFilterData]=useState([])
+  const [filteredData, setFilterData] = useState([]);
   useEffect(() => {
-    setFilterData(data.filter((item) => item._id === id.id))
-  }, [data.length])
-  
+    setFilterData(data.filter((item) => item._id === id.id));
+  }, [data.length]);
+
   // Function to simulate a coin toss
   const tossCoin = () => {
     const randomNum = Math.random();
@@ -27,9 +27,20 @@ function CoinTossSimulator() {
         ? filteredData.map((item) => item.teamA)
         : filteredData.map((item) => item.teamB);
 
+    const lossingTeam =
+      tossResult !== teamChoice
+        ? filteredData.map((item) => item.teamA)
+        : filteredData.map((item) => item.teamB);
     setResult(winningTeam[0]);
+    localStorage.setItem(
+      id.id,
+      JSON.stringify({
+        match: id.id,
+        bat: winningTeam[0]._id,
+        ball: lossingTeam[0]._id,
+      })
+    );
   };
-  console.log(result);
   return (
     <div className="grid place-content-center">
       <Heading center={true} title={"Toss"} subtitle={"Tosses win matches"} />
@@ -81,7 +92,7 @@ function CoinTossSimulator() {
         <Button
           label={"Toss Coin"}
           onClick={() =>
-            nevigate(`/admin/startmatch`, {
+            nevigate(`/admin/startmatch/${id.id}`, {
               state: { match: id.id, team: result._id },
             })
           }

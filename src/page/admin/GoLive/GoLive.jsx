@@ -22,8 +22,13 @@ const Golive = () => {
     return <>Loading.....</>;
   }
   const handleRowSelect = (rowNumber) => {
-    console.log(rowNumber);
-    nevigate(`/admin/toss/${rowNumber}`);
+    const localstorage=localStorage.getItem(rowNumber);
+    if(localstorage){
+      nevigate(`/admin/startmatch/${rowNumber}`);
+    }else{
+
+      nevigate(`/admin/toss/${rowNumber}`);
+    }
   };
 
   return (
