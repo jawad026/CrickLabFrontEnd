@@ -38,7 +38,7 @@ function Home() {
   return (
     <div className="p-3">
       <Search data={seriesData} onClick={(id) => handleSeries(id)} />
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 p-10">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-4 p-10">
         {filterData.map((item) => (
           <MatchCard
             key={item._id}

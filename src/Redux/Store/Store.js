@@ -6,6 +6,7 @@ import { seriesApi } from "../Feature/seriesApi";
 import { authApi } from "../Feature/authApi";
 import { teamApi } from "../Feature/teamApi";
 import { playersApi } from "../Feature/playerApi";
+import { scorecardApi } from "../Feature/scorecardApi";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     [seriesApi.reducerPath]: seriesApi.reducer,
     [teamApi.reducerPath]: teamApi.reducer,
     [playersApi.reducerPath]: playersApi.reducer,
+    [scorecardApi.reducerPath]: playersApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -25,6 +27,7 @@ export const store = configureStore({
       authApi.middleware,
       teamApi.middleware,
       playersApi.middleware,
+      scorecardApi.middleware,
     ]),
 });
 

@@ -8,8 +8,7 @@ import { useGetMatchByIdQuery } from "../../Redux/Feature/matchApi";
 
 function ScoreCard() {
   const param = useParams();
-  const { data: match = {}, isLoading } = useGetMatchByIdQuery(param.id);
-  console.log(isLoading);
+  const { data: match = {} } = useGetMatchByIdQuery(param.id);
   const { data: bat = [] } = useGetTeamPlayersQuery(
     match.teamA && match.teamA._id
   );
@@ -139,9 +138,6 @@ function ScoreCard() {
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Score
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Baller

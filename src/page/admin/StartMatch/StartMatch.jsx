@@ -6,12 +6,17 @@ import { useGetTeamPlayersQuery } from "../../../Redux/Feature/playerApi";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/common/button/Button";
 import Heading from "../../../components/common/heading/Heading";
+import { useAddScoreCardMutation } from "../../../Redux/Feature/scorecardApi";
 
 const StartMatch = () => {
   const param = useParams();
-  const match = localStorage.getItem(param.id);
-  const { data: bat = [] } = useGetTeamPlayersQuery(JSON.parse(match).bat);
-  const { data: balling = [] } = useGetTeamPlayersQuery(JSON.parse(match).ball);
+  const [matchData, setMatchData] = useState(
+    JSON.parse(localStorage.getItem(param.id))
+  );
+  const { data: bat = [] } = useGetTeamPlayersQuery(matchData.bat);
+  const { data: balling = [] } = useGetTeamPlayersQuery(matchData.ball);
+  const [scorecard] = useAddScoreCardMutation();
+  const [score, setScore] = useState({});
   const socket = io("http://localhost:3001"); // Replace with your server URL
   const [run, setRun] = useState(0);
   const [ball, setBall] = useState(0);
@@ -26,14 +31,16 @@ const StartMatch = () => {
     if (bat.length > 0) {
       setActive([bat[0]._id, bat[1]._id]);
       setNextToBat(bat.slice(2).map((item) => item._id));
-
+      setRun(0);
+      setBall(0);
+      setOver(0);
       const playerScores = {};
       bat.forEach((bat) => {
         playerScores[bat._id] = 0;
       });
       setPlayerScore(playerScores);
     }
-  }, [bat.length]);
+  }, [matchData]);
 
   const incrementPlayerScore = (playerId, score) => {
     setPlayerScore((prevScores) => ({
@@ -71,6 +78,8 @@ const StartMatch = () => {
   useEffect(() => {
     socket.emit("scoreUpdated", {
       match: param.id,
+      batting: matchData.bat,
+      balling: matchData.ball,
       run: run,
       ball: ball,
       active: active,
@@ -79,8 +88,19 @@ const StartMatch = () => {
       playerScore: playerScore,
       over: over,
     });
-
-    if (ball % 6 === 0) {
+    setScore({
+      match: param.id,
+      batting: matchData.bat,
+      balling: matchData.ball,
+      run: run,
+      ball: ball,
+      active: active,
+      out: out,
+      baller: baller,
+      playerScore: playerScore,
+      over: over,
+    });
+    if (ball % 6 == 0) {
       setDisable(false);
     } else {
       setDisable(true);
@@ -96,11 +116,42 @@ const StartMatch = () => {
   };
 
   const handleBaller = (id) => {
+    setDisable(false);
+    console.log(disable);
     setBaller((prev) => [id, ...prev]);
     baller.pop();
   };
+  const HandleInnings = () => {
+    const bat = matchData.bat;
+    const ball = matchData.ball;
+
+    // scorecard(score)
+    //   .unwrap()
+    //   .then((response) => {
+    //     console.log(response);
+    //     // Handle successful login response, e.g., store user token or redirect
+    //   })
+    //   .catch((err) => {
+    //     // Handle login error
+    //     console.log(err);
+    //     // toast.error(error);
+    //   });
+
+    localStorage.setItem(
+      param.id,
+      JSON.stringify({
+        match: param.id,
+        bat: ball,
+        ball: bat,
+      })
+    );
+
+    setMatchData(JSON.parse(localStorage.getItem(param.id)));
+  };
+  console.log(disable ? false : true);
   return (
-    <div className="">
+    <div className="relative">
+      <Button label={"2nd Innings"} onClick={() => HandleInnings()} />
       <Heading title={"Score Mointering System"} center />
       <div className="flex justify-center mt-10">
         <div className="grid auto-rows-max grid-cols-4 grid-rows-2  gap-1 w-1/2 ">
