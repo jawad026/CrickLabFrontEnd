@@ -10,7 +10,6 @@ import Heading from "../../../components/common/heading/Heading";
 const StartMatch = () => {
   const param = useParams();
   const match = localStorage.getItem(param.id);
-  console.log(match);
   const { data: bat = [] } = useGetTeamPlayersQuery(JSON.parse(match).bat);
   const { data: balling = [] } = useGetTeamPlayersQuery(JSON.parse(match).ball);
   const socket = io("http://localhost:3001"); // Replace with your server URL
@@ -71,13 +70,14 @@ const StartMatch = () => {
   };
   useEffect(() => {
     socket.emit("scoreUpdated", {
+      match: param.id,
       run: run,
       ball: ball,
       active: active,
       out: out,
-      baller:baller,
+      baller: baller,
       playerScore: playerScore,
-      over:over
+      over: over,
     });
 
     if (ball % 6 === 0) {
@@ -99,7 +99,6 @@ const StartMatch = () => {
     setBaller((prev) => [id, ...prev]);
     baller.pop();
   };
-  console.log(baller);
   return (
     <div className="">
       <Heading title={"Score Mointering System"} center />

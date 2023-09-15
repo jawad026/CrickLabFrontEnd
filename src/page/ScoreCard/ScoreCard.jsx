@@ -4,21 +4,33 @@ import { io } from "socket.io-client";
 import clsx from "clsx";
 import { useParams } from "react-router-dom";
 import { useGetTeamPlayersQuery } from "../../Redux/Feature/playerApi";
+import { useGetMatchByIdQuery } from "../../Redux/Feature/matchApi";
 
 function ScoreCard() {
   const param = useParams();
-  const match = localStorage.getItem(param.id);
-  const { data: bat = [] } = useGetTeamPlayersQuery(JSON.parse(match).bat);
-  const { data: balling = [] } = useGetTeamPlayersQuery(JSON.parse(match).ball);
+  const { data: match = {}, isLoading } = useGetMatchByIdQuery(param.id);
+  console.log(isLoading);
+  const { data: bat = [] } = useGetTeamPlayersQuery(
+    match.teamA && match.teamA._id
+  );
+  const { data: balling = [] } = useGetTeamPlayersQuery(
+    match.teamB && match.teamB._id
+  );
+  console.log(bat);
   const [over, setOver] = useState("0.0");
-  const [score, setscore] = useState({
-    run: 0,
-    ball: 0,
-    active: [],
-    out: [],
-    baller: [],
-    playerScore: [],
-  });
+  const getScore = localStorage.getItem(`${match._id}score`);
+  const [score, setscore] = useState(
+    JSON.parse(getScore)
+      ? JSON.parse(getScore)
+      : {
+          run: 0,
+          ball: 0,
+          active: [],
+          out: [],
+          baller: [],
+          playerScore: [],
+        }
+  );
 
   useEffect(() => {
     const socket = io("http://localhost:3001"); // Replace with your server URL
@@ -34,9 +46,13 @@ function ScoreCard() {
     };
   }, []);
   useEffect(() => {
+    const matchScore = param.id + "score";
+    if (score.run > 0) localStorage.setItem(matchScore, JSON.stringify(score));
+  }, [param.id, score, score.run]);
+  useEffect(() => {
     const convertBallsToOvers = () => {
-      const overs = Math.floor((score.ball ) / 6);
-      const remainingBalls = (score.ball ) % 6;
+      const overs = Math.floor(score.ball / 6);
+      const remainingBalls = score.ball % 6;
       console.log(remainingBalls, score.ball);
       setOver(`${overs}.${remainingBalls}`);
     };

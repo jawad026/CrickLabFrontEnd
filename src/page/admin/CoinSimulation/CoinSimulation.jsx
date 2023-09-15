@@ -32,6 +32,7 @@ function CoinTossSimulator() {
         ? filteredData.map((item) => item.teamA)
         : filteredData.map((item) => item.teamB);
     setResult(winningTeam[0]);
+    
     localStorage.setItem(
       id.id,
       JSON.stringify({
